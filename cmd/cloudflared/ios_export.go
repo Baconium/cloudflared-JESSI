@@ -1,5 +1,10 @@
+//go:build ios
+
 package main
 
+/*
+#include <stdlib.h>
+*/
 import "C"
 
 import (
@@ -7,6 +12,7 @@ import (
 	"sync"
 	"unsafe"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/urfave/cli/v2"
 
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/access"
@@ -20,6 +26,7 @@ var (
 	iosShutdown chan struct{}
 )
 
+//export cloudflared_run
 func cloudflared_run(argc C.int, argv **C.char) C.int {
 	args := make([]string, 0, int(argc)+1)
 	args = append(args, "cloudflared")
@@ -28,6 +35,9 @@ func cloudflared_run(argc C.int, argv **C.char) C.int {
 	}
 
 	os.Setenv("QUIC_GO_DISABLE_ECN", "1")
+	registry := prometheus.NewRegistry()
+	prometheus.DefaultRegisterer = registry
+	prometheus.DefaultGatherer = registry
 	metrics.RegisterBuildInfo(BuildType, BuildTime, Version)
 	bInfo := cliutil.GetBuildInfo(BuildType, Version)
 
@@ -35,6 +45,8 @@ func cloudflared_run(argc C.int, argv **C.char) C.int {
 	iosMu.Lock()
 	iosShutdown = shutdown
 	iosMu.Unlock()
+
+	cli.OsExiter = func(int) {}
 
 	app := &cli.App{}
 	app.Name = "cloudflared"
@@ -51,6 +63,7 @@ func cloudflared_run(argc C.int, argv **C.char) C.int {
 	return 0
 }
 
+//export cloudflared_stop
 func cloudflared_stop() {
 	iosMu.Lock()
 	defer iosMu.Unlock()
