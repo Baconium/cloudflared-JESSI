@@ -22,4 +22,6 @@ $CLANG $FLAGS -dynamiclib -o "$OUT/libcloudflared.dylib" \
   -framework CoreFoundation -framework Security -lresolv
 
 rm -f "$OUT/libcloudflared.a"
+codesign --force --sign - "$OUT/libcloudflared.dylib"
+codesign --verify "$OUT/libcloudflared.dylib"
 echo "Built $OUT/libcloudflared.dylib ($VERSION)"
