@@ -1,3 +1,7 @@
+# Note for iOS
+
+the only differences between this fork and upstream is cmd/ios_export.go and iosbuild.sh. to build the library for iOS, simply run iosbuild.sh on your mac. very difficult I know. anyways the rest of this readme is from cloudflare
+
 # Cloudflare Tunnel client
 
 Contains the command-line client for Cloudflare Tunnel, a tunneling daemon that proxies traffic from the Cloudflare network to your origins.

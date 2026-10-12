@@ -20,3 +20,4 @@ built_artifacts/
 component-tests/.venv
 /artifacts
 /vendor
+/dist
